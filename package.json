@@ -1,0 +1,40 @@
+{
+  "name": "@dfpunk/mainnet-sponsored-fpc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "accounts:generate": "tsx src/cli.ts accounts:generate",
+    "accounts:show": "tsx src/cli.ts accounts:show",
+    "preflight": "tsx src/cli.ts preflight",
+    "operator:bridge": "tsx src/cli.ts operator:bridge",
+    "fpc:derive": "tsx src/cli.ts fpc:derive",
+    "fpc:deploy": "tsx src/cli.ts fpc:deploy",
+    "fpc:topup": "tsx src/cli.ts fpc:topup",
+    "claim": "tsx src/cli.ts claim",
+    "status": "tsx src/cli.ts status",
+    "verify": "tsx src/cli.ts verify",
+    "mainnet:setup": "tsx src/cli.ts mainnet:setup",
+    "test": "tsx --test test/**/*.test.ts",
+    "test:alpha": "tsx src/cli.ts preflight",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm typecheck"
+  },
+  "dependencies": {
+    "@aztec/accounts": "5.1.0",
+    "@aztec/aztec.js": "5.1.0",
+    "@aztec/ethereum": "5.1.0",
+    "@aztec/l1-artifacts": "5.1.0",
+    "@aztec/noir-contracts.js": "5.1.0",
+    "@aztec/stdlib": "5.1.0",
+    "@aztec/wallets": "5.1.0",
+    "dotenv": "^17.2.3",
+    "viem": "^2.38.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.7",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
