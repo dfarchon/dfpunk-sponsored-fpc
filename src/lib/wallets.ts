@@ -1,7 +1,7 @@
-import { AztecAddress } from "@aztec/aztec.js/addresses";
-import { Fq, Fr } from "@aztec/aztec.js/fields";
-import type { AztecNode } from "@aztec/aztec.js/node";
-import { EmbeddedWallet } from "@aztec/wallets/embedded";
+import { AztecAddress } from "@aztec-labs/aztec.js/addresses";
+import { Fq, Fr } from "@aztec-labs/aztec.js/fields";
+import type { AztecNode } from "@aztec-labs/aztec.js/node";
+import { EmbeddedWallet } from "@aztec-labs/wallets/embedded";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 

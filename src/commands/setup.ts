@@ -1,5 +1,5 @@
-import { AztecAddress } from "@aztec/aztec.js/addresses";
-import { getFeeJuiceBalance } from "@aztec/aztec.js/utils";
+import { AztecAddress } from "@aztec-labs/aztec.js/addresses";
+import { getFeeJuiceBalance } from "@aztec-labs/aztec.js/utils";
 
 import { createNetworkClients, loadConfig } from "../config.js";
 import { readAccountSecrets } from "../lib/accounts.js";

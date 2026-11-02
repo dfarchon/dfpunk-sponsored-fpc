@@ -1,8 +1,8 @@
-# Aztec 5.0.1 Mainnet Sponsored FPC
+# Aztec 6.0.0 Mainnet Sponsored FPC
 
 面向运维的 TypeScript CLI：在 Alpha（以太坊主网）上派生并实验性发布 Aztec 内置的 `SponsoredFPC`，桥接真实 Fee Juice、将其 claim 到 FPC，并测试赞助式手续费支付。
 
-所有 Aztec 依赖固定为 `5.0.1`。交易类命令默认 dry-run；只有同时提供 `--execute` 与 `--confirm-mainnet` 才会真正上链。
+所有 Aztec 依赖固定为 `6.0.0`。交易类命令默认 dry-run；只有同时提供 `--execute` 与 `--confirm-mainnet` 才会真正上链。
 
 ## 重要限制
 
@@ -14,7 +14,7 @@ Aztec 文档将内置 `SponsoredFPC` 限定为 testnet / devnet / 本地使用�
 
 - Node.js 24+
 - pnpm
-- Aztec Alpha node 版本 `5.0.1`、`5.1.0` 或 `5.2.0`
+- Aztec node 版本 `6.0.0`
 - 以太坊主网 RPC
 - L1 ETH（用于 approve / deposit 的 gas）
 - L1 Fee Juice（`$AZTEC`，用于桥接）
@@ -23,10 +23,10 @@ Aztec 文档将内置 `SponsoredFPC` 限定为 testnet / devnet / 本地使用�
 
 ```bash
 pnpm install
-cp .env.example .env.mainnet.5.0.1.local
+cp .env.example .env.mainnet.6.0.0.local
 ```
 
-在 `.env.mainnet.5.0.1.local` 中设置 `ETHEREUM_RPC_URL`。Aztec RPC 默认值为 `https://aztec-mainnet.drpc.org`。
+在 `.env.mainnet.6.0.0.local` 中设置 `ETHEREUM_RPC_URL`。Aztec RPC 默认值为 `https://aztec-mainnet.drpc.org`。
 
 ## 生成以太坊与 Aztec 账户
 
@@ -40,7 +40,7 @@ pnpm accounts:show
 - 以太坊私钥与 EOA 地址
 - Aztec Schnorr 无 initializer 账户的 secret / signing key / salt / address
 
-密钥会以原子写方式写入 `.env.mainnet.5.0.1.local`，文件权限为 `0600`。除非提供 `--force`，否则不会覆盖已有密钥。私钥永远不会打印到终端。
+密钥会以原子写方式写入 `.env.mainnet.6.0.0.local`，文件权限为 `0600`。除非提供 `--force`，否则不会覆盖已有密钥。私钥永远不会打印到终端。
 
 任意命令都可用 `--secrets-file <path>` 指定其它密钥文件。
 
@@ -54,7 +54,7 @@ pnpm preflight
 
 - 以太坊 chain ID 为 `1`
 - Aztec L1 chain ID 为 `1`
-- Aztec node 版本为 `5.0.1`、`5.1.0` 或 `5.2.0`（SponsoredFPC artifact 仍固定为 `5.0.1`）
+- Aztec node 版本为 `6.0.0`（SponsoredFPC artifact 固定为 `6.0.0`）
 - 节点返回非零的 Fee Juice 与 portal 地址
 
 ## 派生并发布自定义 salt 的 SponsoredFPC
@@ -79,7 +79,7 @@ pnpm fpc:deploy --salt 0x1234
 pnpm fpc:deploy --salt 0x1234 --execute --confirm-mainnet
 ```
 
-幂等部署清单保存在 `deployments/mainnet-5.0.1.json`，记录 salt、确定性地址、class ID、artifact SHA-256、交易哈希、版本与发布状态。
+幂等部署清单保存在 `deployments/mainnet-6.0.0.json`，记录 salt、确定性地址、class ID、artifact SHA-256、交易哈希、版本与发布状态。
 
 ## 引导 Aztec operator
 
@@ -124,7 +124,7 @@ pnpm fpc:topup --target-balance 1000
 pnpm fpc:topup --target-balance 1000 --execute --confirm-mainnet
 ```
 
-默认 FPC 地址来自 `deployments/mainnet-5.0.1.json`，也可通过 `--address <aztec-address>` 或 `--salt <field>` 指定。每次 top-up 都会在 `claims/mainnet` 下新建一条权限为 `0600` 的 claim 记录；重复 top-up 不会覆盖以往的 claim secret。
+默认 FPC 地址来自 `deployments/mainnet-6.0.0.json`，也可通过 `--address <aztec-address>` 或 `--salt <field>` 指定。每次 top-up 都会在 `claims/mainnet-6.0.0` 下新建一条权限为 `0600` 的 claim 记录；重复 top-up 不会覆盖以往的 claim secret。
 
 查看状态并 claim：
 
@@ -137,7 +137,7 @@ pnpm claim --id fpc-... --execute --confirm-mainnet
 pnpm claim --all-ready --execute --confirm-mainnet
 ```
 
-FPC claim id 会写入 `claims/mainnet/fpc-ids.txt`。`pnpm claim` 不带 `--id` 时会自动 claim 尚未完成的 FPC 记录。`--all-ready` 还会包含 operator bootstrap claim。
+FPC claim id 会写入 `claims/mainnet-6.0.0/fpc-ids.txt`。`pnpm claim` 不带 `--id` 时会自动 claim 尚未完成的 FPC 记录。`--all-ready` 还会包含 operator bootstrap claim。
 
 FPC 的 claim 由已注资的 operator 发起，并调用规范合约 `FeeJuice.claim(fpcAddress, amount, secret, leafIndex)`。
 

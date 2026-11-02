@@ -1,9 +1,9 @@
-import { SponsoredFeePaymentMethod } from "@aztec/aztec.js/fee/testing";
-import { getFeeJuiceBalance } from "@aztec/aztec.js/utils";
+import { SponsoredFeePaymentMethod } from "@aztec-labs/aztec.js/fee/testing";
+import { getFeeJuiceBalance } from "@aztec-labs/aztec.js/utils";
 import {
   ExecutionPayload,
   mergeExecutionPayloads,
-} from "@aztec/aztec.js/tx";
+} from "@aztec-labs/aztec.js/tx";
 
 import { createNetworkClients, loadConfig, runNetworkPreflight } from "../config.js";
 import { readAccountSecrets } from "../lib/accounts.js";

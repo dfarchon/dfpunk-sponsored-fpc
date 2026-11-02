@@ -8,10 +8,10 @@ import {
 } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 
-import { getSchnorrInitializerlessAccountContractAddress } from '@aztec/accounts/schnorr';
-import type { AztecNode } from '@aztec/aztec.js/node';
-import { Fr, GrumpkinScalar } from '@aztec/aztec.js/fields';
-import { deriveStorageSlotInMap } from '@aztec/stdlib/hash';
+import { getSchnorrInitializerlessAccountContractAddress } from '@aztec-labs/accounts/schnorr';
+import type { AztecNode } from '@aztec-labs/aztec.js/node';
+import { Fr, GrumpkinScalar } from '@aztec-labs/aztec.js/fields';
+import { deriveStorageSlotInMap } from '@aztec-labs/stdlib/hash';
 import { parse as parseDotenv } from 'dotenv';
 import {
   formatEther,

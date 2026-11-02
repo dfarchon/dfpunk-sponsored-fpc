@@ -16,7 +16,7 @@ test("custom salt derives a stable universal SponsoredFPC address", async () => 
   assert.equal(first.address.toString(), second.address.toString());
   assert.equal(
     first.address.toString(),
-    "0x06e7f5250fe0675bdcaf8c8d556fd2167393cc70a8daa17246f6c83171d31e01",
+    "0x1ea83387ec1210410728bfd2555f8a97a4aff78111525a863a3601127852feb7",
   );
 });
 

@@ -1,11 +1,11 @@
-import { AztecAddress } from "@aztec/aztec.js/addresses";
-import { Fr } from "@aztec/aztec.js/fields";
+import { AztecAddress } from "@aztec-labs/aztec.js/addresses";
+import { Fr } from "@aztec-labs/aztec.js/fields";
 import {
   SponsoredFPCContract,
   SponsoredFPCContractArtifact,
-} from "@aztec/noir-contracts.js/SponsoredFPC";
-import { getContractInstanceFromInstantiationParams } from "@aztec/stdlib/contract";
-import type { Wallet } from "@aztec/aztec.js/wallet";
+} from "@aztec-labs/noir-contracts.js/SponsoredFPC";
+import { getContractInstanceFromInstantiationParams } from "@aztec-labs/stdlib/contract";
+import type { Wallet } from "@aztec-labs/aztec.js/wallet";
 
 export function parseSalt(value?: string): Fr {
   if (!value || value === "random") return Fr.random();

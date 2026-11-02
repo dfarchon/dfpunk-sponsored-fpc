@@ -103,7 +103,7 @@ test("deployment manifest round trips", () => {
     const manifest: DeploymentManifest = {
       network: "mainnet",
       l1ChainId: 1,
-      aztecVersion: "5.0.1",
+      aztecVersion: "6.0.0",
       salt: "0x01",
       address: "0x02",
       contractClassId: "0x03",

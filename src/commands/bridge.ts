@@ -1,7 +1,7 @@
-import { AztecAddress } from "@aztec/aztec.js/addresses";
-import { FeeJuicePaymentMethodWithClaim } from "@aztec/aztec.js/fee";
-import { Fr } from "@aztec/aztec.js/fields";
-import { getFeeJuiceBalance } from "@aztec/aztec.js/utils";
+import { AztecAddress } from "@aztec-labs/aztec.js/addresses";
+import { FeeJuicePaymentMethodWithClaim } from "@aztec-labs/aztec.js/fee";
+import { Fr } from "@aztec-labs/aztec.js/fields";
+import { getFeeJuiceBalance } from "@aztec-labs/aztec.js/utils";
 
 import { createNetworkClients, loadConfig, runNetworkPreflight } from "../config.js";
 import { readAccountSecrets } from "../lib/accounts.js";

@@ -1,13 +1,13 @@
-import { AztecAddress } from "@aztec/aztec.js/addresses";
-import { L1FeeJuicePortalManager } from "@aztec/aztec.js/ethereum";
-import { Fr } from "@aztec/aztec.js/fields";
-import { createLogger } from "@aztec/aztec.js/log";
-import { isL1ToL2MessageReady } from "@aztec/aztec.js/messaging";
-import type { AztecNode } from "@aztec/aztec.js/node";
-import { FeeJuiceContract } from "@aztec/aztec.js/protocol";
-import type { Wallet } from "@aztec/aztec.js/wallet";
-import { createExtendedL1Client } from "@aztec/ethereum/client";
-import { TestERC20Abi } from "@aztec/l1-artifacts/TestERC20Abi";
+import { AztecAddress } from "@aztec-labs/aztec.js/addresses";
+import { L1FeeJuicePortalManager } from "@aztec-labs/aztec.js/ethereum";
+import { Fr } from "@aztec-labs/aztec.js/fields";
+import { createLogger } from "@aztec-labs/aztec.js/log";
+import { isL1ToL2MessageReady } from "@aztec-labs/aztec.js/messaging";
+import type { AztecNode } from "@aztec-labs/aztec.js/node";
+import { FeeJuiceContract } from "@aztec-labs/aztec.js/protocol";
+import type { Wallet } from "@aztec-labs/aztec.js/wallet";
+import { createExtendedL1Client } from "@aztec-labs/ethereum/client";
+import { TestERC20Abi } from "@aztec-foundation/l1-artifacts/TestERC20Abi";
 import {
   createPublicClient,
   formatEther,
@@ -188,7 +188,7 @@ export async function claimToFpc(
   if (claim.status === "claimed") {
     throw new Error(`Claim ${claim.id} is already claimed.`);
   }
-  const feeJuice = FeeJuiceContract.at(wallet);
+  const feeJuice = FeeJuiceContract.withWallet(wallet);
   return feeJuice.methods
     .claim(
       AztecAddress.fromStringUnsafe(claim.recipient),

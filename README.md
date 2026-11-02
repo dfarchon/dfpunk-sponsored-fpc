@@ -1,10 +1,10 @@
-# Aztec 5.0.1 Mainnet Sponsored FPC
+# Aztec 6.0.0 Mainnet Sponsored FPC
 
 Operational TypeScript CLI for deriving and experimentally publishing Aztec's
 built-in `SponsoredFPC` on Alpha (Ethereum mainnet), bridging real Fee Juice,
 claiming it to the FPC, and testing sponsored fee payment.
 
-All Aztec dependencies are pinned to `5.0.1`. Transaction commands are dry-run
+All Aztec dependencies are pinned to `6.0.0`. Transaction commands are dry-run
 unless both `--execute` and `--confirm-mainnet` are supplied.
 
 ## Important limitation
@@ -21,7 +21,7 @@ Never bridge a large amount before `verify` succeeds with a small balance.
 
 - Node.js 24+
 - pnpm
-- Aztec Alpha node version `5.0.1`, `5.1.0`, or `5.2.0`
+- Aztec node version `6.0.0`
 - Ethereum mainnet RPC
 - L1 ETH for approval/deposit gas
 - L1 Fee Juice (`$AZTEC`) for bridging
@@ -30,10 +30,10 @@ Install:
 
 ```bash
 pnpm install
-cp .env.example .env.mainnet.5.0.1.local
+cp .env.example .env.mainnet.6.0.0.local
 ```
 
-Set `ETHEREUM_RPC_URL` in `.env.mainnet.5.0.1.local`. The Aztec RPC defaults to
+Set `ETHEREUM_RPC_URL` in `.env.mainnet.6.0.0.local`. The Aztec RPC defaults to
 `https://aztec-mainnet.drpc.org`.
 
 ## Generate Ethereum and Aztec accounts
@@ -48,7 +48,7 @@ This creates:
 - Ethereum private key and EOA address
 - Aztec Schnorr initializerless account secret/signing key/salt/address
 
-Secrets are written atomically to `.env.mainnet.5.0.1.local` with mode `0600`.
+Secrets are written atomically to `.env.mainnet.6.0.0.local` with mode `0600`.
 Existing secrets are not overwritten unless `--force` is supplied. Private
 keys are never printed.
 
@@ -64,7 +64,7 @@ Preflight requires:
 
 - Ethereum chain ID `1`
 - Aztec L1 chain ID `1`
-- Aztec node version `5.0.1`, `5.1.0`, or `5.2.0` (the SponsoredFPC artifact remains pinned to `5.0.1`)
+- Aztec node version `6.0.0` (the SponsoredFPC artifact is pinned to `6.0.0`)
 - non-zero Fee Juice and portal addresses returned by the node
 
 ## Derive and publish a custom-salt SponsoredFPC
@@ -91,7 +91,7 @@ pnpm fpc:deploy --salt 0x1234 --execute --confirm-mainnet
 ```
 
 The idempotent deployment manifest is stored in
-`deployments/mainnet-5.0.1.json`. It records the salt, deterministic address, class
+`deployments/mainnet-6.0.0.json`. It records the salt, deterministic address, class
 ID, artifact SHA-256, transaction hash, version, and publication state.
 
 ## Bootstrap the Aztec operator
@@ -139,9 +139,9 @@ pnpm fpc:topup --target-balance 1000
 pnpm fpc:topup --target-balance 1000 --execute --confirm-mainnet
 ```
 
-By default the FPC comes from `deployments/mainnet-5.0.1.json`. It can also be
+By default the FPC comes from `deployments/mainnet-6.0.0.json`. It can also be
 selected with `--address <aztec-address>` or `--salt <field>`. Every top-up
-creates a separate mode-`0600` claim record under `claims/mainnet`; repeated
+creates a separate mode-`0600` claim record under `claims/mainnet-6.0.0`; repeated
 top-ups never overwrite previous claim secrets.
 
 Inspect and claim:
@@ -155,7 +155,7 @@ pnpm claim --id fpc-... --execute --confirm-mainnet
 pnpm claim --all-ready --execute --confirm-mainnet
 ```
 
-FPC claim ids are written to `claims/mainnet/fpc-ids.txt`. `pnpm claim`
+FPC claim ids are written to `claims/mainnet-6.0.0/fpc-ids.txt`. `pnpm claim`
 without `--id` claims pending FPC records automatically. `--all-ready`
 also includes operator bootstrap claims.
 

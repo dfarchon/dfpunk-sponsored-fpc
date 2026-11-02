@@ -9,6 +9,8 @@ import {
 } from "node:fs";
 import path from "node:path";
 
+import { AZTEC_VERSION } from "../config.js";
+
 export type ClaimKind = "operator" | "fpc";
 export type ClaimStatus = "deposited" | "ready" | "claimed" | "failed";
 
@@ -29,7 +31,7 @@ export type ClaimRecord = {
 };
 
 export function claimDirectory(root = process.cwd()): string {
-  return path.join(root, "claims", "mainnet");
+  return path.join(root, "claims", `mainnet-${AZTEC_VERSION}`);
 }
 
 export function fpcIdsPath(root = process.cwd()): string {

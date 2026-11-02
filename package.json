@@ -23,15 +23,15 @@
     "lint": "pnpm typecheck"
   },
   "dependencies": {
-    "@aztec/accounts": "5.0.1",
-    "@aztec/aztec.js": "5.0.1",
-    "@aztec/ethereum": "5.0.1",
-    "@aztec/l1-artifacts": "5.0.1",
-    "@aztec/noir-contracts.js": "5.0.1",
-    "@aztec/stdlib": "5.0.1",
-    "@aztec/wallets": "5.0.1",
+    "@aztec-foundation/l1-artifacts": "6.0.0",
+    "@aztec-labs/accounts": "6.0.0",
+    "@aztec-labs/aztec.js": "6.0.0",
+    "@aztec-labs/ethereum": "6.0.0",
+    "@aztec-labs/noir-contracts.js": "6.0.0",
+    "@aztec-labs/stdlib": "6.0.0",
+    "@aztec-labs/wallets": "6.0.0",
     "dotenv": "^17.2.3",
-    "viem": "^2.38.2"
+    "viem": "2.57.1"
   },
   "devDependencies": {
     "@types/node": "^24.10.7",

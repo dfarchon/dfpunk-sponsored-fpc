@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 
-import { createAztecNodeClient, type AztecNode } from '@aztec/aztec.js/node';
-import type { NodeInfo } from '@aztec/aztec.js/contracts';
+import { createAztecNodeClient, type AztecNode } from '@aztec-labs/aztec.js/node';
+import type { NodeInfo } from '@aztec-labs/aztec.js/contracts';
 import { config as loadDotenv } from 'dotenv';
 import {
   createPublicClient,
@@ -10,11 +10,11 @@ import {
 } from 'viem';
 import { mainnet } from 'viem/chains';
 
-export const AZTEC_VERSION = '5.0.1';
-export const SUPPORTED_AZTEC_NODE_VERSIONS = [AZTEC_VERSION, '5.1.0', '5.2.0'] as const;
+export const AZTEC_VERSION = '6.0.0';
+export const SUPPORTED_AZTEC_NODE_VERSIONS = [AZTEC_VERSION] as const;
 export const ETHEREUM_MAINNET_CHAIN_ID = 1;
 export const DEFAULT_AZTEC_NODE_URL = 'https://aztec-mainnet.drpc.org';
-export const DEFAULT_ENV_FILE = '.env.mainnet.5.0.1.local';
+export const DEFAULT_ENV_FILE = '.env.mainnet.6.0.0.local';
 
 export interface AppConfig {
   aztecNodeUrl: string;
