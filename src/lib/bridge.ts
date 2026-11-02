@@ -17,6 +17,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
+import { assertMainnetNodeInfo } from "../config.js";
 import {
   createClaimId,
   type ClaimKind,
@@ -67,15 +68,7 @@ export async function assertMainnetConnections(
   if (chainId !== 1) {
     throw new Error(`Ethereum RPC chain ID is ${chainId}; expected mainnet 1.`);
   }
-  if (info.l1ChainId !== 1) {
-    throw new Error(
-      `Aztec node reports L1 chain ID ${info.l1ChainId}; expected mainnet 1.`,
-    );
-  }
-  const version = String(info.nodeVersion);
-  if (!version.includes("5.1.0")) {
-    throw new Error(`Aztec node version is ${version}; expected 5.1.0.`);
-  }
+  assertMainnetNodeInfo(info);
   if (
     info.l1ContractAddresses.feeJuiceAddress.isZero() ||
     info.l1ContractAddresses.feeJuicePortalAddress.isZero()

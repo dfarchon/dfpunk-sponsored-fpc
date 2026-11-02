@@ -10,3 +10,7 @@ coverage/
 .store/
 claims/
 deployments/
+
+.DS_Store
+command.md
+*.sock

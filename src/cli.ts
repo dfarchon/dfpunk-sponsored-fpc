@@ -3,6 +3,7 @@ import {
   bridgeOperator,
   claimCommand,
   claimsStatus,
+  fpcBalance,
   fpcTopUp,
 } from "./commands/bridge.js";
 import { fpcDeploy, fpcDerive } from "./commands/fpc.js";
@@ -17,9 +18,10 @@ function usage(): never {
   operator:bridge --amount <FJ> [--execute --confirm-mainnet]
   fpc:derive [--salt random|<field>]
   fpc:deploy [--salt <field>] [--execute --confirm-mainnet]
+  fpc:balance [--address <aztec-address> | --salt <field>]
   fpc:topup (--amount <FJ> | --target-balance <FJ>) [--execute --confirm-mainnet]
   status [--id <claim-id>]
-  claim (--id <claim-id> | --all-ready) [--execute --confirm-mainnet]
+  claim [--id <claim-id> | --all-ready] [--execute --confirm-mainnet]
   verify [--execute --confirm-mainnet]
   mainnet:setup --operator-amount <FJ> --fpc-amount <FJ> [--salt <field>] [--execute --confirm-mainnet]
 
@@ -48,6 +50,9 @@ async function main(): Promise<void> {
       return;
     case "fpc:deploy":
       await fpcDeploy(argv);
+      return;
+    case "fpc:balance":
+      await fpcBalance(argv);
       return;
     case "fpc:topup":
       await fpcTopUp(argv);

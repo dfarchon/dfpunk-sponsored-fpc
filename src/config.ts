@@ -10,10 +10,11 @@ import {
 } from 'viem';
 import { mainnet } from 'viem/chains';
 
-export const AZTEC_VERSION = '5.1.0';
+export const AZTEC_VERSION = '5.0.1';
+export const SUPPORTED_AZTEC_NODE_VERSIONS = [AZTEC_VERSION, '5.1.0', '5.2.0'] as const;
 export const ETHEREUM_MAINNET_CHAIN_ID = 1;
 export const DEFAULT_AZTEC_NODE_URL = 'https://aztec-mainnet.drpc.org';
-export const DEFAULT_ENV_FILE = '.env.mainnet.local';
+export const DEFAULT_ENV_FILE = '.env.mainnet.5.0.1.local';
 
 export interface AppConfig {
   aztecNodeUrl: string;
@@ -85,12 +86,14 @@ export function assertMainnetNodeInfo(nodeInfo: NodeInfo): void {
       `Aztec node is connected to L1 chain ${nodeInfo.l1ChainId}; expected Ethereum mainnet (1)`,
     );
   }
-  if (
-    nodeInfo.nodeVersion !== AZTEC_VERSION &&
-    !nodeInfo.nodeVersion.startsWith(`${AZTEC_VERSION}-`)
-  ) {
+  const nodeVersionSupported = SUPPORTED_AZTEC_NODE_VERSIONS.some(
+    version =>
+      nodeInfo.nodeVersion === version ||
+      nodeInfo.nodeVersion.startsWith(`${version}-`),
+  );
+  if (!nodeVersionSupported) {
     throw new Error(
-      `Aztec node version ${nodeInfo.nodeVersion} is unsupported; expected ${AZTEC_VERSION}`,
+      `Aztec node version ${nodeInfo.nodeVersion} is unsupported; expected ${SUPPORTED_AZTEC_NODE_VERSIONS.join(' or ')}`,
     );
   }
 }

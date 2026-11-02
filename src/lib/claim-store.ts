@@ -32,6 +32,10 @@ export function claimDirectory(root = process.cwd()): string {
   return path.join(root, "claims", "mainnet");
 }
 
+export function fpcIdsPath(root = process.cwd()): string {
+  return path.join(claimDirectory(root), "fpc-ids.txt");
+}
+
 function assertClaimId(id: string): void {
   if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
     throw new Error(`Invalid claim id: ${id}`);
@@ -62,12 +66,51 @@ export function createClaimId(kind: ClaimKind, messageHash: string): string {
   return `${kind}-${Date.now()}-${suffix}`;
 }
 
+function writeFpcIds(ids: string[], root = process.cwd()): void {
+  const destination = fpcIdsPath(root);
+  mkdirSync(path.dirname(destination), { recursive: true, mode: 0o700 });
+  writeFileSync(destination, ids.length ? `${ids.join("\n")}\n` : "", {
+    mode: 0o600,
+  });
+  try {
+    chmodSync(destination, 0o600);
+  } catch {
+    // POSIX permissions are unavailable on some platforms.
+  }
+}
+
+export function listRecordedFpcIds(root = process.cwd()): string[] {
+  const destination = fpcIdsPath(root);
+  if (!existsSync(destination)) return [];
+  return readFileSync(destination, "utf8")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith("#"));
+}
+
+export function syncFpcIdLog(root = process.cwd()): string[] {
+  const ids = listClaims(root)
+    .filter((claim) => claim.kind === "fpc")
+    .map((claim) => claim.id);
+  writeFpcIds(ids, root);
+  return ids;
+}
+
 export function saveClaim(
   claim: ClaimRecord,
   root = process.cwd(),
 ): ClaimRecord {
   atomicWrite(claimPath(claim.id, root), claim);
+  if (claim.kind === "fpc") syncFpcIdLog(root);
   return claim;
+}
+
+export function actionableFpcClaims(
+  root = process.cwd(),
+): ClaimRecord[] {
+  return listClaims(root).filter(
+    (claim) => claim.kind === "fpc" && isActionableClaim(claim),
+  );
 }
 
 export function loadClaim(

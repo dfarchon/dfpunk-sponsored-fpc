@@ -11,6 +11,7 @@
     "operator:bridge": "tsx src/cli.ts operator:bridge",
     "fpc:derive": "tsx src/cli.ts fpc:derive",
     "fpc:deploy": "tsx src/cli.ts fpc:deploy",
+    "fpc:balance": "tsx src/cli.ts fpc:balance",
     "fpc:topup": "tsx src/cli.ts fpc:topup",
     "claim": "tsx src/cli.ts claim",
     "status": "tsx src/cli.ts status",
@@ -22,13 +23,13 @@
     "lint": "pnpm typecheck"
   },
   "dependencies": {
-    "@aztec/accounts": "5.1.0",
-    "@aztec/aztec.js": "5.1.0",
-    "@aztec/ethereum": "5.1.0",
-    "@aztec/l1-artifacts": "5.1.0",
-    "@aztec/noir-contracts.js": "5.1.0",
-    "@aztec/stdlib": "5.1.0",
-    "@aztec/wallets": "5.1.0",
+    "@aztec/accounts": "5.0.1",
+    "@aztec/aztec.js": "5.0.1",
+    "@aztec/ethereum": "5.0.1",
+    "@aztec/l1-artifacts": "5.0.1",
+    "@aztec/noir-contracts.js": "5.0.1",
+    "@aztec/stdlib": "5.0.1",
+    "@aztec/wallets": "5.0.1",
     "dotenv": "^17.2.3",
     "viem": "^2.38.2"
   },

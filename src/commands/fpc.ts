@@ -1,6 +1,11 @@
 import { createHash } from "node:crypto";
 
-import { createNetworkClients, loadConfig, runNetworkPreflight } from "../config.js";
+import {
+  AZTEC_VERSION,
+  createNetworkClients,
+  loadConfig,
+  runNetworkPreflight,
+} from "../config.js";
 import { readAccountSecrets } from "../lib/accounts.js";
 import {
   getStringFlag,
@@ -87,7 +92,7 @@ export async function fpcDeploy(argv: readonly string[]) {
   const baseManifest: DeploymentManifest = {
     network: "mainnet",
     l1ChainId: 1,
-    aztecVersion: "5.1.0",
+    aztecVersion: AZTEC_VERSION,
     salt: salt.toString(),
     address: derived.address.toString(),
     contractClassId: derived.currentContractClassId.toString(),

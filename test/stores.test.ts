@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import {
+  actionableFpcClaims,
+  fpcIdsPath,
   isActionableClaim,
   listClaims,
+  listRecordedFpcIds,
   loadClaim,
   saveClaim,
   sumClaimedAmount,
@@ -65,9 +68,30 @@ test("claim store preserves multiple top ups and status", () => {
     );
     updateClaim("fpc-one", { status: "claimed" }, root);
 
+    saveClaim(
+      {
+        ...base,
+        id: "operator-one",
+        kind: "operator",
+        amount: "5",
+        messageHash: "0x9abc",
+        depositedAt: "2026-01-03T00:00:00.000Z",
+      },
+      root,
+    );
+
     assert.equal(loadClaim("fpc-one", root).status, "claimed");
-    assert.equal(listClaims(root).length, 2);
+    assert.equal(listClaims(root).length, 3);
     assert.equal(sumClaimedAmount("0xAbC", root), 10n);
+    assert.deepEqual(listRecordedFpcIds(root), ["fpc-one", "fpc-two"]);
+    assert.deepEqual(
+      actionableFpcClaims(root).map((claim) => claim.id),
+      ["fpc-two"],
+    );
+    assert.equal(
+      readFileSync(fpcIdsPath(root), "utf8"),
+      "fpc-one\nfpc-two\n",
+    );
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -79,7 +103,7 @@ test("deployment manifest round trips", () => {
     const manifest: DeploymentManifest = {
       network: "mainnet",
       l1ChainId: 1,
-      aztecVersion: "5.1.0",
+      aztecVersion: "5.0.1",
       salt: "0x01",
       address: "0x02",
       contractClassId: "0x03",

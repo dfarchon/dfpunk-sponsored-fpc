@@ -14,7 +14,10 @@ import {
   rejectUnknownFlags,
 } from "../lib/args.js";
 import { getL1FundingSnapshot, printL1FundingSnapshot } from "../lib/bridge.js";
-import { loadDeployment } from "../lib/deployment-store.js";
+import {
+  deploymentPath,
+  loadDeployment,
+} from "../lib/deployment-store.js";
 import {
   deriveSponsoredFpc,
   parseSalt,
@@ -76,7 +79,7 @@ export async function verifyCommand(argv: readonly string[]) {
     throw new Error("Mainnet probe requires --execute --confirm-mainnet.");
   }
   const deployment = loadDeployment();
-  if (!deployment) throw new Error("No deployments/mainnet.json manifest.");
+  if (!deployment) throw new Error(`No ${deploymentPath()} manifest.`);
 
   const config = configFromArgs(args);
   const clients = createNetworkClients(config);

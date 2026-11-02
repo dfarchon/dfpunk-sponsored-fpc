@@ -5,7 +5,7 @@ import { getFeeJuiceBalance } from "@aztec/aztec.js/utils";
 
 import { createNetworkClients, loadConfig, runNetworkPreflight } from "../config.js";
 import { readAccountSecrets } from "../lib/accounts.js";
-import { parsePositiveAmount, topUpAmount } from "../lib/amount.js";
+import { formatAmount, parsePositiveAmount, topUpAmount } from "../lib/amount.js";
 import {
   getStringFlag,
   hasFlag,
@@ -20,11 +20,14 @@ import {
   printL1FundingSnapshot,
 } from "../lib/bridge.js";
 import {
+  actionableFpcClaims,
+  fpcIdsPath,
   isActionableClaim,
   listClaims,
   loadClaim,
   saveClaim,
   sumClaimedAmount,
+  syncFpcIdLog,
   updateClaim,
   type ClaimRecord,
 } from "../lib/claim-store.js";
@@ -73,6 +76,26 @@ function requireExecuteConfirmation(args: ReturnType<typeof parseArgs>): void {
   if (hasFlag(args, "execute") && !hasFlag(args, "confirm-mainnet")) {
     throw new Error("Mainnet transactions require --execute --confirm-mainnet.");
   }
+}
+
+export async function fpcBalance(argv: readonly string[]) {
+  const args = parseArgs(argv);
+  rejectUnknownFlags(args, ["address", "salt", "secrets-file"]);
+  assertNoPositionals(args.positionals);
+
+  const config = configFromArgs(args);
+  const clients = createNetworkClients(config);
+  await runNetworkPreflight(clients);
+  const fpcAddress = await resolveFpcAddress(
+    getStringFlag(args, "address"),
+    getStringFlag(args, "salt"),
+  );
+  const balance = await getFeeJuiceBalance(fpcAddress, clients.aztecNode);
+
+  console.log(`SponsoredFPC: ${fpcAddress.toString()}`);
+  console.log(`Fee Juice:    ${formatAmount(balance)}`);
+  console.log(`Base units:   ${balance.toString()}`);
+  return { address: fpcAddress.toString(), balance };
 }
 
 export async function fpcTopUp(argv: readonly string[]) {
@@ -145,7 +168,10 @@ export async function fpcTopUp(argv: readonly string[]) {
   );
   saveClaim(claim);
   console.log(`Saved claim ${claim.id}.`);
-  console.log("After inclusion, run claim --id <id> --execute --confirm-mainnet.");
+  console.log(`Recorded FPC ids: ${fpcIdsPath()}`);
+  console.log(
+    "After inclusion, run claim --wait --execute --confirm-mainnet (uses the latest pending FPC id).",
+  );
   return claim;
 }
 
@@ -201,6 +227,7 @@ export async function claimsStatus(argv: readonly string[]) {
   const config = configFromArgs(args);
   const clients = createNetworkClients(config);
   await runNetworkPreflight(clients);
+  syncFpcIdLog();
   const id = getStringFlag(args, "id");
   const claims = id ? [loadClaim(id)] : listClaims();
   for (const claim of claims) {
@@ -339,14 +366,27 @@ export async function claimCommand(argv: readonly string[]) {
   ]);
   assertNoPositionals(args.positionals);
   requireExecuteConfirmation(args);
+  syncFpcIdLog();
   const id = getStringFlag(args, "id");
   const allReady = hasFlag(args, "all-ready");
-  if ((id ? 1 : 0) + (allReady ? 1 : 0) !== 1) {
-    throw new Error("Pass exactly one of --id or --all-ready.");
+  if (id && allReady) {
+    throw new Error("Pass only one of --id or --all-ready.");
   }
   const claims = id
     ? [loadClaim(id)]
-    : listClaims().filter(isActionableClaim);
+    : allReady
+      ? listClaims().filter(isActionableClaim)
+      : actionableFpcClaims();
+  if (!id && !allReady) {
+    if (!claims.length) {
+      throw new Error(
+        `No pending FPC claim. Recorded ids are in ${fpcIdsPath()}, or pass --id / --all-ready.`,
+      );
+    }
+    for (const claim of claims) {
+      console.log(`Using recorded FPC claim ${claim.id}.`);
+    }
+  }
   let claimed = 0;
   for (const claim of claims) {
     if (await claimOne(claim, args)) claimed += 1;

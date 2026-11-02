@@ -8,10 +8,12 @@ import {
 } from "node:fs";
 import path from "node:path";
 
+import { AZTEC_VERSION } from "../config.js";
+
 export type DeploymentManifest = {
   network: "mainnet";
   l1ChainId: 1;
-  aztecVersion: "5.1.0";
+  aztecVersion: typeof AZTEC_VERSION;
   salt: string;
   address: string;
   contractClassId: string;
@@ -25,7 +27,7 @@ export type DeploymentManifest = {
 };
 
 export function deploymentPath(root = process.cwd()): string {
-  return path.join(root, "deployments", "mainnet.json");
+  return path.join(root, "deployments", `mainnet-${AZTEC_VERSION}.json`);
 }
 
 export function loadDeployment(
