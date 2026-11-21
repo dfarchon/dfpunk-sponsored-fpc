@@ -45,12 +45,12 @@ pnpm accounts:show
 
 This creates:
 
-- Ethereum private key and EOA address
+- Ethereum private key, EOA address, and uncompressed secp256k1 public key
 - Aztec Schnorr initializerless account secret/signing key/salt/address
 
 Secrets are written atomically to `.env.mainnet.6.0.0.local` with mode `0600`.
-Existing secrets are not overwritten unless `--force` is supplied. Private
-keys are never printed.
+If that file already exists, the new account is appended. Commands use the last
+value of each key. `--force` replaces the file. Private keys are never printed.
 
 Use `--secrets-file <path>` on any command to select another secrets file.
 

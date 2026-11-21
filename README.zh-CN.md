@@ -37,10 +37,10 @@ pnpm accounts:show
 
 会创建：
 
-- 以太坊私钥与 EOA 地址
+- 以太坊私钥、EOA 地址，以及 secp256k1 未压缩公钥
 - Aztec Schnorr 无 initializer 账户的 secret / signing key / salt / address
 
-密钥会以原子写方式写入 `.env.mainnet.6.0.0.local`，文件权限为 `0600`。除非提供 `--force`，否则不会覆盖已有密钥。私钥永远不会打印到终端。
+密钥会以原子写方式写入 `.env.mainnet.6.0.0.local`，文件权限为 `0600`。文件已存在时，新账户追加到末尾；同名变量以最后一次为准。`--force` 会整文件替换。私钥永远不会打印到终端。
 
 任意命令都可用 `--secrets-file <path>` 指定其它密钥文件。
 

@@ -25,7 +25,8 @@ function usage(): never {
   verify [--execute --confirm-mainnet]
   mainnet:setup --operator-amount <FJ> --fpc-amount <FJ> [--salt <field>] [--execute --confirm-mainnet]
 
-All network commands accept --secrets-file <path>. Transactions default to dry-run.`);
+All network commands accept --secrets-file <path>. Transactions default to dry-run.
+accounts:generate appends a new account when the secrets file already exists; --force replaces the file.`);
   process.exit(1);
 }
 

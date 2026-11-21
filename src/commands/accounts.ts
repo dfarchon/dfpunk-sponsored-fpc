@@ -5,10 +5,13 @@ import {
   runNetworkPreflight,
 } from '../config.js';
 import {
+  appendSecretsAtomically,
   generateAccounts,
   getAccountBalances,
   readAccountSecrets,
+  secretsFileExists,
   serializeAccountEnv,
+  serializeAppendedAccount,
   writeSecretsAtomically,
   type AccountBalances,
 } from '../lib/accounts.js';
@@ -25,12 +28,15 @@ export interface CommandOutput {
 
 export interface AccountsGenerateResult {
   envFile: string;
+  action: 'created' | 'appended' | 'replaced';
   ethereumAddress: string;
+  ethereumPublicKey: string;
   aztecAddress: string;
 }
 
 export interface AccountsShowResult {
   ethereumAddress: string;
+  ethereumPublicKey: string;
   aztecAddress: string;
   balances: AccountBalances;
 }
@@ -52,19 +58,42 @@ export async function accountsGenerate(
   const envFile = getStringFlag(args, 'secrets-file') ?? DEFAULT_ENV_FILE;
   const appConfig = loadConfig({ envFile });
   const generated = await generateAccounts();
-  const writtenPath = await writeSecretsAtomically(
-    appConfig.envFile,
-    serializeAccountEnv(generated, appConfig),
-    { force: hasFlag(args, 'force') },
-  );
+  const force = hasFlag(args, 'force');
+  const exists = await secretsFileExists(appConfig.envFile);
+  const action: AccountsGenerateResult['action'] = exists
+    ? force
+      ? 'replaced'
+      : 'appended'
+    : 'created';
+  const writtenPath =
+    action === 'appended'
+      ? await appendSecretsAtomically(
+          appConfig.envFile,
+          serializeAppendedAccount(generated),
+        )
+      : await writeSecretsAtomically(
+          appConfig.envFile,
+          serializeAccountEnv(generated, appConfig),
+          { force },
+        );
   const result = {
     envFile: writtenPath,
+    action,
     ethereumAddress: generated.ethereumAddress,
+    ethereumPublicKey: generated.ethereumPublicKey,
     aztecAddress: generated.aztecAddress,
   };
 
-  output.log(`Wrote account secrets to ${writtenPath} (mode 0600).`);
+  if (action === 'appended') {
+    output.log(`Appended account secrets to ${writtenPath} (mode 0600).`);
+    output.log('Commands use the last value of each key in this file.');
+  } else if (action === 'replaced') {
+    output.log(`Replaced account secrets in ${writtenPath} (mode 0600).`);
+  } else {
+    output.log(`Wrote account secrets to ${writtenPath} (mode 0600).`);
+  }
   output.log(`Ethereum address: ${result.ethereumAddress}`);
+  output.log(`Ethereum public key: ${result.ethereumPublicKey}`);
   output.log(`Aztec address: ${result.aztecAddress}`);
   return result;
 }
@@ -85,11 +114,13 @@ export async function accountsShow(
   const balances = await getAccountBalances(accounts, clients);
   const result = {
     ethereumAddress: accounts.ethereumAddress,
+    ethereumPublicKey: accounts.ethereumPublicKey,
     aztecAddress: accounts.aztecAddress,
     balances,
   };
 
   output.log(`Ethereum address: ${result.ethereumAddress}`);
+  output.log(`Ethereum public key: ${result.ethereumPublicKey}`);
   output.log(`Ethereum balance: ${balances.ethereumEth} ETH`);
   output.log(`Aztec address: ${result.aztecAddress}`);
   output.log(`Fee Juice public balance: ${balances.feeJuiceFormatted}`);

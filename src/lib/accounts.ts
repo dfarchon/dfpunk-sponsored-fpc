@@ -3,6 +3,7 @@ import {
   chmod,
   link,
   open,
+  readFile,
   rename,
   unlink,
 } from 'node:fs/promises';
@@ -34,6 +35,7 @@ export interface AccountSecrets {
 
 export interface GeneratedAccounts extends AccountSecrets {
   ethereumAddress: Address;
+  ethereumPublicKey: Hex;
   aztecAddress: string;
 }
 
@@ -57,7 +59,7 @@ function parseHex32(name: string, value: string | undefined): Hex {
 
 export async function generateAccounts(): Promise<GeneratedAccounts> {
   const ethereumPrivateKey = generatePrivateKey();
-  const ethereumAddress = privateKeyToAccount(ethereumPrivateKey).address;
+  const ethereumAccount = privateKeyToAccount(ethereumPrivateKey);
   const aztecSecretKey = Fr.random();
   const aztecSigningKey = GrumpkinScalar.random();
   const aztecAccountSalt = Fr.random();
@@ -71,12 +73,25 @@ export async function generateAccounts(): Promise<GeneratedAccounts> {
 
   return {
     ethereumPrivateKey,
-    ethereumAddress,
+    ethereumAddress: ethereumAccount.address,
+    ethereumPublicKey: ethereumAccount.publicKey,
     aztecSecretKey,
     aztecSigningKey,
     aztecAccountSalt,
     aztecAddress,
   };
+}
+
+export function serializeAccountFields(accounts: GeneratedAccounts): string {
+  return [
+    `ETHEREUM_PRIVATE_KEY=${accounts.ethereumPrivateKey}`,
+    `ETHEREUM_ADDRESS=${accounts.ethereumAddress}`,
+    `ETHEREUM_PUBLIC_KEY=${accounts.ethereumPublicKey}`,
+    `AZTEC_SECRET_KEY=${accounts.aztecSecretKey.toString()}`,
+    `AZTEC_SIGNING_KEY=${accounts.aztecSigningKey.toString()}`,
+    `AZTEC_ACCOUNT_SALT=${accounts.aztecAccountSalt.toString()}`,
+    `AZTEC_ACCOUNT_ADDRESS=${accounts.aztecAddress}`,
+  ].join('\n');
 }
 
 export function serializeAccountEnv(
@@ -87,13 +102,24 @@ export function serializeAccountEnv(
     '# Generated mainnet account material. Keep this file secret.',
     `AZTEC_NODE_URL=${network.aztecNodeUrl}`,
     `ETHEREUM_RPC_URL=${network.ethereumRpcUrl}`,
-    `ETHEREUM_PRIVATE_KEY=${accounts.ethereumPrivateKey}`,
-    `AZTEC_SECRET_KEY=${accounts.aztecSecretKey.toString()}`,
-    `AZTEC_SIGNING_KEY=${accounts.aztecSigningKey.toString()}`,
-    `AZTEC_ACCOUNT_SALT=${accounts.aztecAccountSalt.toString()}`,
-    `AZTEC_ACCOUNT_ADDRESS=${accounts.aztecAddress}`,
+    serializeAccountFields(accounts),
     '',
   ].join('\n');
+}
+
+export function serializeAppendedAccount(accounts: GeneratedAccounts): string {
+  return [
+    `# Appended account ${new Date().toISOString()}`,
+    serializeAccountFields(accounts),
+    '',
+  ].join('\n');
+}
+
+export function mergeAccountEnv(existing: string, block: string): string {
+  const addition = block.endsWith('\n') ? block : `${block}\n`;
+  if (existing.trim().length === 0) return addition;
+  const base = existing.endsWith('\n') ? existing : `${existing}\n`;
+  return base.endsWith('\n\n') ? `${base}${addition}` : `${base}\n${addition}`;
 }
 
 export async function writeSecretsAtomically(
@@ -152,6 +178,30 @@ export async function writeSecretsAtomically(
   }
 }
 
+export async function secretsFileExists(destination: string): Promise<boolean> {
+  try {
+    const handle = await open(resolve(destination), 'r');
+    await handle.close();
+    return true;
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+      return false;
+    }
+    throw error;
+  }
+}
+
+export async function appendSecretsAtomically(
+  destination: string,
+  block: string,
+): Promise<string> {
+  const target = resolve(destination);
+  const existing = await readFile(target, 'utf8');
+  return writeSecretsAtomically(target, mergeAccountEnv(existing, block), {
+    force: true,
+  });
+}
+
 export async function readAccountSecrets(
   envFile: string,
 ): Promise<GeneratedAccounts> {
@@ -176,7 +226,9 @@ export async function readAccountSecrets(
   const aztecAccountSalt = Fr.fromString(
     parseHex32('AZTEC_ACCOUNT_SALT', values.AZTEC_ACCOUNT_SALT),
   );
-  const ethereumAddress = privateKeyToAccount(ethereumPrivateKey).address;
+  const ethereumAccount = privateKeyToAccount(ethereumPrivateKey);
+  const ethereumAddress = ethereumAccount.address;
+  const ethereumPublicKey = ethereumAccount.publicKey;
   const aztecAddress = (
     await getSchnorrInitializerlessAccountContractAddress(
       aztecSigningKey,
@@ -185,6 +237,16 @@ export async function readAccountSecrets(
     )
   ).toString();
 
+  assertOptionalHexMatch(
+    'ETHEREUM_ADDRESS',
+    values.ETHEREUM_ADDRESS,
+    ethereumAddress,
+  );
+  assertOptionalHexMatch(
+    'ETHEREUM_PUBLIC_KEY',
+    values.ETHEREUM_PUBLIC_KEY,
+    ethereumPublicKey,
+  );
   if (
     values.AZTEC_ACCOUNT_ADDRESS &&
     values.AZTEC_ACCOUNT_ADDRESS !== aztecAddress
@@ -197,11 +259,22 @@ export async function readAccountSecrets(
   return {
     ethereumPrivateKey,
     ethereumAddress,
+    ethereumPublicKey,
     aztecSecretKey,
     aztecSigningKey,
     aztecAccountSalt,
     aztecAddress,
   };
+}
+
+function assertOptionalHexMatch(
+  name: string,
+  actual: string | undefined,
+  expected: string,
+): void {
+  if (actual && actual.toLowerCase() !== expected.toLowerCase()) {
+    throw new Error(`${name} does not match ETHEREUM_PRIVATE_KEY`);
+  }
 }
 
 export async function getAccountBalances(
