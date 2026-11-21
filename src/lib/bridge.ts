@@ -12,7 +12,9 @@ import {
   createPublicClient,
   formatEther,
   formatUnits,
+  getAddress,
   http,
+  isAddress,
   type Address,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -87,39 +89,52 @@ export type L1FundingSnapshot = {
   allowance: bigint;
 };
 
-export async function getL1FundingSnapshot(
+export function parseEthereumAddress(value: string): Address {
+  if (!isAddress(value, { strict: false })) {
+    throw new Error("--address must be an Ethereum address.");
+  }
+  return getAddress(value);
+}
+
+export async function readL1FundingSnapshot(
   node: AztecNode,
   ethereumRpcUrl: string,
-  privateKey: `0x${string}`,
+  holder: Address,
 ): Promise<L1FundingSnapshot> {
-  const clients = createL1Clients(ethereumRpcUrl, privateKey);
+  const publicClient = createPublicClient({
+    chain: {
+      ...mainnet,
+      rpcUrls: { default: { http: [ethereumRpcUrl] } },
+    },
+    transport: http(ethereumRpcUrl),
+  });
   const info = await node.getNodeInfo();
   const tokenAddress =
     info.l1ContractAddresses.feeJuiceAddress.toString() as Address;
   const portalAddress =
     info.l1ContractAddresses.feeJuicePortalAddress.toString() as Address;
   const [decimals, ethBalance, tokenBalance, allowance] = await Promise.all([
-    clients.publicClient.readContract({
+    publicClient.readContract({
       address: tokenAddress,
       abi: TestERC20Abi,
       functionName: "decimals",
     }),
-    clients.publicClient.getBalance({ address: clients.account.address }),
-    clients.publicClient.readContract({
+    publicClient.getBalance({ address: holder }),
+    publicClient.readContract({
       address: tokenAddress,
       abi: TestERC20Abi,
       functionName: "balanceOf",
-      args: [clients.account.address],
+      args: [holder],
     }),
-    clients.publicClient.readContract({
+    publicClient.readContract({
       address: tokenAddress,
       abi: TestERC20Abi,
       functionName: "allowance",
-      args: [clients.account.address, portalAddress],
+      args: [holder, portalAddress],
     }),
   ]);
   return {
-    l1Address: clients.account.address,
+    l1Address: holder,
     tokenAddress,
     portalAddress,
     decimals: Number(decimals),
@@ -127,6 +142,15 @@ export async function getL1FundingSnapshot(
     tokenBalance,
     allowance,
   };
+}
+
+export async function getL1FundingSnapshot(
+  node: AztecNode,
+  ethereumRpcUrl: string,
+  privateKey: `0x${string}`,
+): Promise<L1FundingSnapshot> {
+  const { account } = createL1Clients(ethereumRpcUrl, privateKey);
+  return readL1FundingSnapshot(node, ethereumRpcUrl, account.address);
 }
 
 export function printL1FundingSnapshot(snapshot: L1FundingSnapshot): void {

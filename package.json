@@ -7,6 +7,7 @@
   "scripts": {
     "accounts:generate": "tsx src/cli.ts accounts:generate",
     "accounts:show": "tsx src/cli.ts accounts:show",
+    "l1:balance": "tsx src/cli.ts l1:balance",
     "preflight": "tsx src/cli.ts preflight",
     "operator:bridge": "tsx src/cli.ts operator:bridge",
     "fpc:derive": "tsx src/cli.ts fpc:derive",

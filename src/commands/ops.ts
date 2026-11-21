@@ -13,7 +13,14 @@ import {
   parseArgs,
   rejectUnknownFlags,
 } from "../lib/args.js";
-import { getL1FundingSnapshot, printL1FundingSnapshot } from "../lib/bridge.js";
+import { formatEther, formatUnits } from "viem";
+
+import {
+  getL1FundingSnapshot,
+  parseEthereumAddress,
+  printL1FundingSnapshot,
+  readL1FundingSnapshot,
+} from "../lib/bridge.js";
 import {
   deploymentPath,
   loadDeployment,
@@ -62,6 +69,42 @@ export async function preflightCommand(argv: readonly string[]) {
     );
   }
   return result;
+}
+
+export async function l1BalanceCommand(argv: readonly string[]) {
+  const args = parseArgs(argv);
+  rejectUnknownFlags(args, ["address", "secrets-file"]);
+  if (args.positionals.length) {
+    throw new Error(`Unexpected argument: ${args.positionals[0]}`);
+  }
+  const addressText = getStringFlag(args, "address");
+  const requestedAddress = addressText
+    ? parseEthereumAddress(addressText)
+    : undefined;
+
+  const config = configFromArgs(args);
+  const clients = createNetworkClients(config);
+  await runNetworkPreflight(clients);
+  const l1Address =
+    requestedAddress ??
+    (await readAccountSecrets(config.envFile)).ethereumAddress;
+  const snapshot = await readL1FundingSnapshot(
+    clients.aztecNode,
+    config.ethereumRpcUrl,
+    l1Address,
+  );
+
+  console.log(`L1 address:       ${snapshot.l1Address}`);
+  console.log(`Fee Juice token:  ${snapshot.tokenAddress}`);
+  console.log(
+    `L1 Fee Juice:    ${formatUnits(snapshot.tokenBalance, snapshot.decimals)}`,
+  );
+  console.log(`Base units:       ${snapshot.tokenBalance.toString()}`);
+  console.log(`ETH:              ${formatEther(snapshot.ethBalance)}`);
+  console.log(
+    `Portal allowance: ${formatUnits(snapshot.allowance, snapshot.decimals)}`,
+  );
+  return snapshot;
 }
 
 export async function verifyCommand(argv: readonly string[]) {

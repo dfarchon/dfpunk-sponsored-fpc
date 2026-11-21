@@ -7,13 +7,18 @@ import {
   fpcTopUp,
 } from "./commands/bridge.js";
 import { fpcDeploy, fpcDerive } from "./commands/fpc.js";
-import { preflightCommand, verifyCommand } from "./commands/ops.js";
+import {
+  l1BalanceCommand,
+  preflightCommand,
+  verifyCommand,
+} from "./commands/ops.js";
 import { mainnetSetup } from "./commands/setup.js";
 
 function usage(): never {
   console.error(`Usage:
   accounts:generate [--secrets-file <path>] [--force]
   accounts:show [--secrets-file <path>]
+  l1:balance [--address <ethereum-address>] [--secrets-file <path>]
   preflight [--secrets-file <path>]
   operator:bridge --amount <FJ> [--execute --confirm-mainnet]
   fpc:derive [--salt random|<field>]
@@ -39,6 +44,9 @@ async function main(): Promise<void> {
       return;
     case "accounts:show":
       await accountsShow(argv);
+      return;
+    case "l1:balance":
+      await l1BalanceCommand(argv);
       return;
     case "preflight":
       await preflightCommand(argv);

@@ -54,6 +54,18 @@ value of each key. `--force` replaces the file. Private keys are never printed.
 
 Use `--secrets-file <path>` on any command to select another secrets file.
 
+## Query the L1 Fee Juice balance
+
+```bash
+pnpm l1:balance
+pnpm l1:balance --address 0xYourEthereumAddress
+```
+
+This reads the L1 `$AZTEC` balance of the Ethereum address in the secrets file.
+`--address` queries another holder and does not need its private key. The
+command also prints that address's ETH balance and Fee Juice portal allowance.
+`accounts:show` prints L1 ETH plus the Aztec account's L2 Fee Juice balance.
+
 ## Preflight
 
 ```bash
@@ -215,7 +227,7 @@ When asked to deploy:
 1. Run `pnpm preflight`.
 2. Run `pnpm accounts:show`; if no keys exist, run
    `pnpm accounts:generate` and ask the operator to fund only the printed L1
-   address.
+   address. Run `pnpm l1:balance` to read that address's L1 `$AZTEC` balance.
 3. Dry-run `pnpm mainnet:setup` with the requested salt and amounts.
 4. Before any real transaction, show the recipient, amount and current
    balances.

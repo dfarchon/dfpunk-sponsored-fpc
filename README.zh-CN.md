@@ -44,6 +44,15 @@ pnpm accounts:show
 
 任意命令都可用 `--secrets-file <path>` 指定其它密钥文件。
 
+## 查询 L1 Fee Juice 余额
+
+```bash
+pnpm l1:balance
+pnpm l1:balance --address 0xYourEthereumAddress
+```
+
+默认读取密钥文件里的以太坊地址，查询它在 L1 上的 `$AZTEC` 余额。`--address` 可以查询其它地址，不需要该地址的私钥。命令同时打印该地址的 ETH 余额，以及授权给 Fee Juice portal 的额度。`accounts:show` 打印的是 L1 ETH，以及 Aztec 账户在 L2 上的 Fee Juice 余额。
+
 ## 预检（Preflight）
 
 ```bash
@@ -189,7 +198,7 @@ pnpm mainnet:setup \
 当被要求部署时：
 
 1. 运行 `pnpm preflight`。
-2. 运行 `pnpm accounts:show`；若尚无密钥，运行 `pnpm accounts:generate`，并请操作员仅为打印出的 L1 地址注资。
+2. 运行 `pnpm accounts:show`；若尚无密钥，运行 `pnpm accounts:generate`，并请操作员仅为打印出的 L1 地址注资。用 `pnpm l1:balance` 查询该地址的 L1 `$AZTEC` 余额。
 3. 用请求的 salt 与金额 dry-run `pnpm mainnet:setup`。
 4. 任何真实交易前，展示收款方、金额与当前余额。
 5. 仅在用户明确授权后，使用 `--execute --confirm-mainnet` 执行。
